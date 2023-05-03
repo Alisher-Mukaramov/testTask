@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/_data
+      - ./migration/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+  api:
+    image: app:latest
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      - HOST=localhost
+      - PORT=8080
+    ports:
+      - 8080:8080
+volumes:
+  db:
+    driver: local
